@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Sticker Collection Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .sticker-book {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 550px;
+            margin: 0 auto;
+            perspective: 2500px;
+        }
+        
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #f9f7ff, #eef2ff);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: hidden;
+            transform-origin: left center;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+            backface-visibility: hidden;
+            z-index: 1;
+        }
+        
+        .page.front {
+            z-index: 3;
+        }
+        
+        .page.back {
+            z-index: 2;
+            transform: rotateY(-180deg);
+        }
+        
+        .sticker-book.flipped .front {
+            transform: rotateY(-180deg);
+            z-index: 2;
+        }
+        
+        .sticker-book.flipped .back {
+            transform: rotateY(0deg);
+            z-index: 3;
+        }
+        
+        .page-header {
+            text-align: center;
+            padding: 10px 0 20px;
+            color: #4a5568;
+        }
+        
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .page-subtitle {
+            font-size: 1rem;
+            color: #718096;
+        }
+        
+        .sticker-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .sticker {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 1;
+        }
+        
+        .sticker:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+        }
+        
+        .sticker img {
+            width: 70%;
+            height: auto;
+            transition: opacity 0.3s ease;
+            opacity: 0.3;
+        }
+        
+        .sticker.collected img {
+            opacity: 1;
+        }
+        
+        .sticker-name {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            right: 0;
+            font-size: 0.75rem;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        
+        .page-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0 5px;
+            color: #4a5568;
+        }
+        
+        .collection-status {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .page-tab {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(255, 94, 98, 0.4);
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .page-tab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(255, 94, 98, 0.6);
+        }
+        
+        .prev-tab {
+            right: auto;
+            left: 20px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+        
+        .prev-tab:hover {
+            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.6);
+        }
+        
+        .instructions {
+            max-width: 800px;
+            margin: 30px auto 0;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #ffd166;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .instructions li i {
+            margin-right: 8px;
+            color: #ffd166;
+        }
+        
+        .github-link {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .github-link:hover {
+            background: rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+        
+        .github-link i {
+            margin-right: 8px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 3px;
+        }
+        
+        .progress-bar {
+            height: 12px;
+            background: linear-gradient(to right, #43e97b, #38f9d7);
+            border-radius: 8px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sticker-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .sticker-book {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sticker-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Interactive Sticker Collection Book</h1>
+        <p class="subtitle">Click on stickers to collect them. Flip pages using the tabs.</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="sticker-book" id="stickerBook">
+            <div class="page front">
+                <div class="page-header">
+                    <div class="page-title">Nature & Animals</div>
+                    <div class="page-subtitle">Collect all nature-themed stickers</div>
+                </div>
+                
+                <div class="sticker-grid">
+                    <div class="sticker" data-page="1" data-id="1">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3223/3223984.png" alt="Tree Sticker">
+                        <div class="sticker-name">Forest</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616516.png" alt="Mountain Sticker">
+                        <div class="sticker-name">Mountains</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616430.png" alt="Sun Sticker">
+                        <div class="sticker-name">Sun</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616438.png" alt="Moon Sticker">
+                        <div class="sticker-name">Moon</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616408.png" alt="Flower Sticker">
+                        <div class="sticker-name">Flower</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616412.png" alt="Leaf Sticker">
+                        <div class="sticker-name">Leaf</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="7">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616415.png" alt="Butterfly Sticker">
+                        <div class="sticker-name">Butterfly</div>
+                    </div>
+                    <div class="sticker" data-page="1" data-id="8">
+                        <img src="https://cdn-icons-png.flaticon.com/512/616/616434.png" alt="Bird Sticker">
+                        <div class="sticker-name">Bird</div>
+                    </div>
+                </div>
+                
+                <div class="page-footer">
+                    <div class="collection-status">Collected: <span id="count1">0</span>/8</div>
+                </div>
+                
+                <div class="page-tab next-tab" id="nextTab">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </div>
+            
+            <div class="page back">
+                <div class="page-header">
+                    <div class="page-title">Food & Drinks</div>
+                    <div class="page-subtitle">Collect delicious food stickers</div>
+                </div>
+                
+                <div class="sticker-grid">
+                    <div class="sticker" data-page="2" data-id="1">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046784.png" alt="Pizza Sticker">
+                        <div class="sticker-name">Pizza</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="2">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046771.png" alt="Burger Sticker">
+                        <div class="sticker-name">Burger</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="3">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046785.png" alt="Ice Cream Sticker">
+                        <div class="sticker-name">Ice Cream</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="4">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046773.png" alt="Coffee Sticker">
+                        <div class="sticker-name">Coffee</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="5">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046776.png" alt="Cake Sticker">
+                        <div class="sticker-name">Cake</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="6">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046787.png" alt="Soda Sticker">
+                        <div class="sticker-name">Soda</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="7">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046794.png" alt="Apple Sticker">
+                        <div class="sticker-name">Apple</div>
+                    </div>
+                    <div class="sticker" data-page="2" data-id="8">
+                        <img src="https://cdn-icons-png.flaticon.com/512/1046/1046792.png" alt="Watermelon Sticker">
+                        <div class="sticker-name">Watermelon</div>
+                    </div>
+                </div>
+                
+                <div class="page-footer">
+                    <div class="collection-status">Collected: <span id="count2">0</span>/8</div>
+                </div>
+                
+                <div class="page-tab prev-tab" id="prevTab">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> How to Use Your Sticker Book</h3>
+            <ul>
+                <li><i class="fas fa-mouse-pointer"></i> Click on any sticker to collect it (opacity will increase to 100%)</li>
+                <li><i class="fas fa-sync-alt"></i> Click again to uncollect a sticker</li>
+                <li><i class="fas fa-book"></i> Use the orange tab on the bottom right to flip to the next page</li>
+                <li><i class="fas fa-book"></i> Use the blue tab on the bottom left to flip to the previous page</li>
+                <li><i class="fas fa-chart-line"></i> Track your collection progress with the progress bar at the top</li>
+                <li><i class="fas fa-save"></i> Your collection is automatically saved in your browser</li>
+            </ul>
+        </div>
+        
+        <a href="https://github.com/" target="_blank" class="github-link">
+            <i class="fab fa-github"></i> View on GitHub
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const stickerBook = document.getElementById('stickerBook');
+            const nextTab = document.getElementById('nextTab');
+            const prevTab = document.getElementById('prevTab');
+            const stickers = document.querySelectorAll('.sticker');
+            const progressBar = document.getElementById('progressBar');
+            
+            // Initialize sticker collection state
+            let collectedStickers = JSON.parse(localStorage.getItem('stickerCollection')) || {};
+            
+            // Apply saved sticker states
+            stickers.forEach(sticker => {
+                const page = sticker.dataset.page;
+                const id = sticker.dataset.id;
+                
+                if (collectedStickers[`${page}-${id}`]) {
+                    sticker.classList.add('collected');
+                }
+            });
+            
+            // Update counts
+            updateCollectionCounts();
+            
+            // Sticker click event
+            stickers.forEach(sticker => {
+                sticker.addEventListener('click', function() {
+                    this.classList.toggle('collected');
+                    
+                    const page = this.dataset.page;
+                    const id = this.dataset.id;
+                    const key = `${page}-${id}`;
+                    
+                    if (this.classList.contains('collected')) {
+                        collectedStickers[key] = true;
+                    } else {
+                        delete collectedStickers[key];
+                    }
+                    
+                    // Save to localStorage
+                    localStorage.setItem('stickerCollection', JSON.stringify(collectedStickers));
+                    
+                    // Update counts and progress
+                    updateCollectionCounts();
+                    updateProgressBar();
+                });
+            });
+            
+            // Page flip event
+            nextTab.addEventListener('click', function() {
+                stickerBook.classList.add('flipped');
+            });
+            
+            prevTab.addEventListener('click', function() {
+                stickerBook.classList.remove('flipped');
+            });
+            
+            // Update collection counts
+            function updateCollectionCounts() {
+                const page1Count = document.querySelectorAll('.page.front .sticker.collected').length;
+                const page2Count = document.querySelectorAll('.page.back .sticker.collected').length;
+                
+                document.getElementById('count1').textContent = page1Count;
+                document.getElementById('count2').textContent = page2Count;
+                
+                updateProgressBar();
+            }
+            
+            // Update progress bar
+            function updateProgressBar() {
+                const totalStickers = stickers.length;
+                const collectedCount = Object.keys(collectedStickers).length;
+                const percentage = (collectedCount / totalStickers) * 100;
+                
+                progressBar.style.width = `${percentage}%`;
+            }
+            
+            // Initialize progress bar
+            updateProgressBar();
+        });
+    </script>
+</body>
+</html>
