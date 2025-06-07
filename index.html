@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Sticker Collection Book</title>
+    <title>My TCC Sticker Book</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,44 +14,144 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            overflow-x: hidden;
         }
         
         .container {
             width: 100%;
             max-width: 1200px;
             text-align: center;
-            color: white;
+            position: relative;
+            z-index: 1;
         }
         
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            background: linear-gradient(to right, #ff9966, #ff5e62);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        .book-cover {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #7a3c12, #5d2a0c);
+            border-radius: 12px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            perspective: 1500px;
+            cursor: pointer;
+            transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            overflow: hidden;
+            border: 15px solid #5d2a0c;
         }
         
-        .subtitle {
-            font-size: 1.2rem;
+        .book-cover:hover {
+            transform: scale(1.02);
+        }
+        
+        .cover-title {
+            font-size: 4.5rem;
+            font-weight: 800;
+            color: #f9e0a8;
+            text-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            letter-spacing: 3px;
             margin-bottom: 30px;
-            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+            text-transform: uppercase;
+            font-family: 'Georgia', serif;
+        }
+        
+        .cover-subtitle {
+            font-size: 1.5rem;
+            color: #f3d9b1;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            font-style: italic;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .open-button {
+            padding: 15px 50px;
+            background: linear-gradient(to right, #e6b980, #d9a464);
+            border: none;
+            border-radius: 50px;
+            color: #5d2a0c;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .open-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(to right, #d9a464, #e6b980);
+        }
+        
+        .cover-design {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .corner-decoration {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border: 8px solid #f9e0a8;
+        }
+        
+        .corner-tl {
+            top: 40px;
+            left: 40px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-tr {
+            top: 40px;
+            right: 40px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-bl {
+            bottom: 40px;
+            left: 40px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-br {
+            bottom: 40px;
+            right: 40px;
+            border-left: none;
+            border-top: none;
         }
         
         .sticker-book {
             position: relative;
-            width: 100%;
-            max-width: 800px;
-            height: 550px;
+            width: 800px;
+            height: 600px;
             margin: 0 auto;
             perspective: 2500px;
+            display: none;
         }
         
         .page {
@@ -96,16 +196,20 @@
             text-align: center;
             padding: 10px 0 20px;
             color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
         }
         
         .page-title {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: 700;
             margin-bottom: 5px;
+            color: #5d2a0c;
+            font-family: 'Georgia', serif;
         }
         
         .page-subtitle {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #718096;
         }
         
@@ -129,6 +233,7 @@
             position: relative;
             overflow: hidden;
             aspect-ratio: 1;
+            border: 1px solid #e2e8f0;
         }
         
         .sticker:hover {
@@ -141,10 +246,12 @@
             height: auto;
             transition: opacity 0.3s ease;
             opacity: 0.3;
+            filter: grayscale(100%);
         }
         
         .sticker.collected img {
             opacity: 1;
+            filter: grayscale(0%);
         }
         
         .sticker-name {
@@ -163,11 +270,14 @@
             align-items: center;
             padding: 15px 0 5px;
             color: #4a5568;
+            border-top: 2px solid #e2e8f0;
+            margin-top: 10px;
         }
         
         .collection-status {
             font-weight: 600;
             font-size: 0.95rem;
+            color: #5d2a0c;
         }
         
         .page-tab {
@@ -176,47 +286,50 @@
             right: 20px;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #ff9966, #ff5e62);
+            background: linear-gradient(135deg, #8B4513, #A0522D);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: white;
+            color: #f9e0a8;
             font-size: 1.2rem;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(255, 94, 98, 0.4);
+            box-shadow: 0 4px 10px rgba(139, 69, 19, 0.4);
             z-index: 10;
             transition: all 0.3s ease;
         }
         
         .page-tab:hover {
             transform: scale(1.1);
-            box-shadow: 0 6px 15px rgba(255, 94, 98, 0.6);
+            box-shadow: 0 6px 15px rgba(139, 69, 19, 0.6);
         }
         
         .prev-tab {
             right: auto;
             left: 20px;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            background: linear-gradient(135deg, #A0522D, #8B4513);
         }
         
         .prev-tab:hover {
-            box-shadow: 0 6px 15px rgba(79, 172, 254, 0.6);
+            box-shadow: 0 6px 15px rgba(160, 82, 45, 0.6);
         }
         
         .instructions {
             max-width: 800px;
             margin: 30px auto 0;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(249, 224, 168, 0.2);
             padding: 20px;
             border-radius: 12px;
             text-align: left;
+            color: #f9e0a8;
+            border: 1px solid rgba(249, 224, 168, 0.3);
         }
         
         .instructions h3 {
             font-size: 1.4rem;
             margin-bottom: 15px;
-            color: #ffd166;
+            color: #f9e0a8;
+            text-align: center;
         }
         
         .instructions ul {
@@ -230,24 +343,24 @@
         
         .instructions li i {
             margin-right: 8px;
-            color: #ffd166;
+            color: #f9e0a8;
         }
         
         .github-link {
             display: inline-block;
             margin-top: 25px;
             padding: 12px 30px;
-            background: rgba(0, 0, 0, 0.2);
-            color: white;
+            background: rgba(249, 224, 168, 0.2);
+            color: #f9e0a8;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(249, 224, 168, 0.3);
         }
         
         .github-link:hover {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(249, 224, 168, 0.3);
             transform: translateY(-3px);
         }
         
@@ -266,52 +379,164 @@
         
         .progress-bar {
             height: 12px;
-            background: linear-gradient(to right, #43e97b, #38f9d7);
+            background: linear-gradient(to right, #e6b980, #d9a464);
             border-radius: 8px;
             width: 0%;
             transition: width 0.5s ease;
         }
         
-        @media (max-width: 768px) {
+        .book-spine {
+            position: absolute;
+            left: -30px;
+            top: 20px;
+            bottom: 20px;
+            width: 30px;
+            background: linear-gradient(to right, #5d2a0c, #7a3c12);
+            border-radius: 5px 0 0 5px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotateY(-10deg);
+            z-index: 0;
+        }
+        
+        .spine-title {
+            transform: rotate(90deg);
+            color: #f9e0a8;
+            font-weight: 600;
+            letter-spacing: 2px;
+            white-space: nowrap;
+            font-size: 1.2rem;
+        }
+        
+        .book-decoration {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        
+        .gold-line {
+            position: absolute;
+            background: linear-gradient(to right, #f9e0a8, #d9a464, #f9e0a8);
+            height: 4px;
+            width: 80%;
+            left: 10%;
+        }
+        
+        .line-top {
+            top: 120px;
+        }
+        
+        .line-bottom {
+            bottom: 120px;
+        }
+        
+        .gold-circle {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #f9e0a8, #d9a464);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.7;
+        }
+        
+        .page-counter {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #5d2a0c;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 850px) {
+            .book-cover, .sticker-book {
+                width: 95%;
+                height: 500px;
+            }
+            
+            .cover-title {
+                font-size: 3.5rem;
+            }
+            
             .sticker-grid {
                 grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .book-cover, .sticker-book {
+                height: 450px;
+            }
+            
+            .cover-title {
+                font-size: 2.5rem;
+            }
+            
+            .cover-subtitle {
+                font-size: 1.2rem;
+                padding: 0 20px;
+            }
+            
+            .sticker-grid {
+                grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
             }
             
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .sticker-book {
-                height: 500px;
+            .page-title {
+                font-size: 1.8rem;
             }
         }
         
         @media (max-width: 480px) {
-            .sticker-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+            .cover-title {
+                font-size: 2rem;
             }
             
-            h1 {
-                font-size: 1.8rem;
+            .cover-subtitle {
+                font-size: 1rem;
             }
             
-            .page-title {
-                font-size: 1.5rem;
+            .open-button {
+                padding: 12px 40px;
+                font-size: 1.1rem;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Interactive Sticker Collection Book</h1>
-        <p class="subtitle">Click on stickers to collect them. Flip pages using the tabs.</p>
-        
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+        <!-- Book Cover -->
+        <div class="book-cover" id="bookCover">
+            <div class="cover-design">
+                <div class="corner-decoration corner-tl"></div>
+                <div class="corner-decoration corner-tr"></div>
+                <div class="corner-decoration corner-bl"></div>
+                <div class="corner-decoration corner-br"></div>
+                <div class="gold-line line-top"></div>
+                <div class="gold-line line-bottom"></div>
+                <div class="gold-circle"></div>
+            </div>
+            <h1 class="cover-title">My TCC Sticker Book</h1>
+            <p class="cover-subtitle">Collect and track your favorite stickers in this interactive digital album</p>
+            <button class="open-button" id="openBook">
+                <i class="fas fa-book-open"></i> Open Book
+            </button>
         </div>
         
+        <div class="book-spine">
+            <div class="spine-title">MY TCC STICKERS</div>
+        </div>
+        
+        <!-- Sticker Book (initially hidden) -->
         <div class="sticker-book" id="stickerBook">
             <div class="page front">
                 <div class="page-header">
@@ -356,6 +581,7 @@
                 
                 <div class="page-footer">
                     <div class="collection-status">Collected: <span id="count1">0</span>/8</div>
+                    <div class="page-counter">Page 1 of 2</div>
                 </div>
                 
                 <div class="page-tab next-tab" id="nextTab">
@@ -406,6 +632,7 @@
                 
                 <div class="page-footer">
                     <div class="collection-status">Collected: <span id="count2">0</span>/8</div>
+                    <div class="page-counter">Page 2 of 2</div>
                 </div>
                 
                 <div class="page-tab prev-tab" id="prevTab">
@@ -414,13 +641,17 @@
             </div>
         </div>
         
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
         <div class="instructions">
             <h3><i class="fas fa-info-circle"></i> How to Use Your Sticker Book</h3>
             <ul>
                 <li><i class="fas fa-mouse-pointer"></i> Click on any sticker to collect it (opacity will increase to 100%)</li>
                 <li><i class="fas fa-sync-alt"></i> Click again to uncollect a sticker</li>
-                <li><i class="fas fa-book"></i> Use the orange tab on the bottom right to flip to the next page</li>
-                <li><i class="fas fa-book"></i> Use the blue tab on the bottom left to flip to the previous page</li>
+                <li><i class="fas fa-book"></i> Use the brown tab on the bottom right to flip to the next page</li>
+                <li><i class="fas fa-book"></i> Use the brown tab on the bottom left to flip to the previous page</li>
                 <li><i class="fas fa-chart-line"></i> Track your collection progress with the progress bar at the top</li>
                 <li><i class="fas fa-save"></i> Your collection is automatically saved in your browser</li>
             </ul>
@@ -434,11 +665,29 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Get DOM elements
+            const bookCover = document.getElementById('bookCover');
             const stickerBook = document.getElementById('stickerBook');
+            const openBookBtn = document.getElementById('openBook');
             const nextTab = document.getElementById('nextTab');
             const prevTab = document.getElementById('prevTab');
             const stickers = document.querySelectorAll('.sticker');
             const progressBar = document.getElementById('progressBar');
+            
+            // Open book button event
+            openBookBtn.addEventListener('click', function() {
+                // Add animation to cover
+                bookCover.style.transform = 'rotateY(-180deg) scale(0.9)';
+                bookCover.style.opacity = '0';
+                bookCover.style.pointerEvents = 'none';
+                
+                // Show sticker book after delay
+                setTimeout(() => {
+                    stickerBook.style.display = 'block';
+                    setTimeout(() => {
+                        stickerBook.style.opacity = '1';
+                    }, 50);
+                }, 800);
+            });
             
             // Initialize sticker collection state
             let collectedStickers = JSON.parse(localStorage.getItem('stickerCollection')) || {};
@@ -467,6 +716,11 @@
                     
                     if (this.classList.contains('collected')) {
                         collectedStickers[key] = true;
+                        // Add a little animation effect
+                        this.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                        }, 300);
                     } else {
                         delete collectedStickers[key];
                     }
